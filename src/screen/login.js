@@ -27,9 +27,9 @@ async loginSubmit()
     
       if(this.ValidateEmail()  && this.ValidatePassword()) 
       {
-       const res = await  login (data).catch(console.error)
+       const res = await  login (data)
        console.warn("data",res)
-       if(typeof res !== "undefined")
+       if(res !== null)
        {
         if(res.password === password && res.user_email===user_email)
         {
@@ -37,7 +37,7 @@ async loginSubmit()
           localStorage.setItem("password",password)
           if(!res.verified)
           {
-            sendmail().catch(console.error)
+            sendmail()
             
          this.props.history.push('auth')
 
@@ -49,9 +49,6 @@ async loginSubmit()
  
         }
 
-       }
-       else{
-         console.warn("login Failed Network Error")
        }
        
        
