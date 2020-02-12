@@ -1,13 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import {login} from '../api/loginApi'
-
+import {login,sendmail} from '../api/loginApi'
 class Login extends React.Component {
   constructor(props) {
     super(props);
     
     this.state = {  
-      eye : false,
       falied :false,
       valid_userEmail :true,
       valid_password :true,
@@ -17,43 +15,7 @@ class Login extends React.Component {
 
 
 
-async componentDidMount()
-{
-  const data = {
-    password :  localStorage.getItem('password'),
-  user_email :localStorage.getItem('useremail')}
-  if(data.user_email  !== null && data.password !==null)
-  {
-    const res = await  login (data).catch(console.error)
-       console.warn("data",res)
-       if(typeof res !== "undefined")
-       {
-        if(res.password === localStorage.getItem('password') && res.user_email===localStorage.getItem('usermail'))
-        {
-          console.warn("going to")
-          if(!res.verified)
-          {
-            
-            
-         this.props.history.push('auth')
 
-          }
-          else
-          {
-            this.props.history.push('interest')
-          }
-         
-        }
-        else
-        {
- window.alert("Login Failed")
-        }
-
-       
-
-  }
-}
-}
 
 async loginSubmit()
 {
@@ -65,9 +27,9 @@ async loginSubmit()
     
       if(this.ValidateEmail()  && this.ValidatePassword()) 
       {
-       const res = await  login (data).catch(console.error)
+       const res = await  login (data)
        console.warn("data",res)
-       if(typeof res !== "undefined")
+       if(res !== null)
        {
         if(res.password === password && res.user_email===user_email)
         {
@@ -75,28 +37,16 @@ async loginSubmit()
           localStorage.setItem("password",password)
           if(!res.verified)
           {
-            
+            sendmail()
             
          this.props.history.push('auth')
 
-          }
-          else
-          {
-            if(localStorage.getItem('interest').length > 0)
-            {
-              this.props.history.push('/home')
-            }
-            else
-            {
-              this.props.history.push('/interest')
-            }
-            
           }
          
         }
         else
         {
-          window.alert("Login Failed")
+ 
         }
 
        }
@@ -136,20 +86,10 @@ ValidateEmail()
   }
 
 
-eye()
-{
-  if(this.state.eye)
-  {
-    this.setState({eye:false})
-  }
-  else
-  {
-    this.setState({eye:true})
-  }
-}
+
   render () {
    
-    const {valid_userEmail,valid_password,eye} =this.state
+    const {valid_userEmail,valid_password} =this.state
 
     return <div className ="pb_cover_v3 overflow-hidden cover-bg-indigo cover-bg-opacity text-left pb_gradient_v1 pb_slant-light">
    <div className="container m-auto ">
@@ -172,26 +112,23 @@ eye()
             }
             <br/>
           </div>
-          <div className="input-group mb-3">
-  <input type= {eye ? "text": "password"}
+          <div>
+          
+            <input
+              type="password"
               className="form-control pb_height-50 reverse"
               placeholder ="Password"
               id ="password"
               defaultValue =""
               onChange = {()=>{this.setState({password : document.getElementById("password").value})}}
-            onBlur ={()=>{this.ValidatePassword()}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
-  <div className="input-group-append">
-    {
-      eye ?  <i className="fa fa-eye"  style = {{ position : "absolute" , transform : '2' ,right : '2%' ,top : "20%"}} onClick = {()=>{this.eye()}} aria-hidden="true"></i> :
-      <i class="fa fa-eye-slash" style = {{ position : "absolute" , transform : '2' ,right : '2%' ,top : "20%"}} onClick = {()=>{this.eye()}} aria-hidden="true"></i>
-    }
- 
-  </div>
-  
-</div>
-{
+            onBlur ={()=>{this.ValidatePassword()}}
+            ></input>
+            {
               valid_password ? true :<small className ="small-color">Incorrect Password</small>
             }
+          </div>
+          <br/>
+         
          <br/>
           <div className="form-group">
           <button type="submit" onClick ={()=>{this.loginSubmit()}} className="btn btn-primary btn-lg btn-block pb_btn-pill  btn-shadow-blue">
@@ -201,7 +138,6 @@ eye()
           </div>
         </div>
       </div>
-     
     </div>
   }
 }

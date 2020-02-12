@@ -8,7 +8,6 @@ import Login from './screen/login'
 import Signup from './screen/signup'
 import Email_verification from './screen/email_verification'
 import Select_Interest from './screen/select_interest'
-import Home from './screen/home'
 function  RoutePage (){
   return <div className="App">
 <Router>
@@ -16,8 +15,7 @@ function  RoutePage (){
 <Route exact path="/"  component={Login} />
 <Route path="/Signup"  component={Signup} />
 <Route path="/Auth" component={Email_verification} />
-<Route path = "/interest" component = {Select_Interest}/>
-<Route path = "/home" component = {Home}/>
+<Route path = "/select-interest" component = {Select_Interest}/>
 </Switch>
 </Router>
 </div>}
