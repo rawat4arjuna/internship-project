@@ -1,11 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import {login,sendmail} from '../api/loginApi'
+import {login} from '../api/loginApi'
+
 class Login extends React.Component {
   constructor(props) {
     super(props);
     
     this.state = {  
+      eye : false,
       falied :false,
       valid_userEmail :true,
       valid_password :true,
@@ -27,9 +29,9 @@ async loginSubmit()
     
       if(this.ValidateEmail()  && this.ValidatePassword()) 
       {
-       const res = await  login (data)
-       console.warn("data",res)
-       if(res !== null)
+       const res = await  login (data).catch(console.error)
+      
+       if(typeof res !== "undefined" &&  res !== null)
        {
         if(res.password === password && res.user_email===user_email)
         {
@@ -37,16 +39,28 @@ async loginSubmit()
           localStorage.setItem("password",password)
           if(!res.verified)
           {
-            sendmail()
+            
             
          this.props.history.push('auth')
 
+          }
+          else
+          {
+            if(localStorage.getItem('interest').length > 0)
+            {
+              this.props.history.push('/home')
+            }
+            else
+            {
+              this.props.history.push('/interest')
+            }
+            
           }
          
         }
         else
         {
- 
+          window.alert("Login Failed")
         }
 
        }
@@ -86,10 +100,20 @@ ValidateEmail()
   }
 
 
-
+eye()
+{
+  if(this.state.eye)
+  {
+    this.setState({eye:false})
+  }
+  else
+  {
+    this.setState({eye:true})
+  }
+}
   render () {
    
-    const {valid_userEmail,valid_password} =this.state
+    const {valid_userEmail,valid_password,eye} =this.state
 
     return <div className ="pb_cover_v3 overflow-hidden cover-bg-indigo cover-bg-opacity text-left pb_gradient_v1 pb_slant-light">
    <div className="container m-auto ">
@@ -112,23 +136,26 @@ ValidateEmail()
             }
             <br/>
           </div>
-          <div>
-          
-            <input
-              type="password"
+          <div className="input-group mb-3">
+  <input type= {eye ? "text": "password"}
               className="form-control pb_height-50 reverse"
               placeholder ="Password"
               id ="password"
               defaultValue =""
               onChange = {()=>{this.setState({password : document.getElementById("password").value})}}
-            onBlur ={()=>{this.ValidatePassword()}}
-            ></input>
-            {
+            onBlur ={()=>{this.ValidatePassword()}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
+  <div className="input-group-append">
+    {
+      eye ?  <i className="fa fa-eye"  style = {{ position : "absolute" , transform : '2' ,right : '2%' ,top : "20%"}} onClick = {()=>{this.eye()}} aria-hidden="true"></i> :
+      <i class="fa fa-eye-slash" style = {{ position : "absolute" , transform : '2' ,right : '2%' ,top : "20%"}} onClick = {()=>{this.eye()}} aria-hidden="true"></i>
+    }
+ 
+  </div>
+  
+</div>
+{
               valid_password ? true :<small className ="small-color">Incorrect Password</small>
             }
-          </div>
-          <br/>
-         
          <br/>
           <div className="form-group">
           <button type="submit" onClick ={()=>{this.loginSubmit()}} className="btn btn-primary btn-lg btn-block pb_btn-pill  btn-shadow-blue">
@@ -138,6 +165,7 @@ ValidateEmail()
           </div>
         </div>
       </div>
+     
     </div>
   }
 }

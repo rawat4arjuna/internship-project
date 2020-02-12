@@ -1,21 +1,36 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import {signup,checkEmail} from '../api/registerApi'
+import GoogleApiWrapper from './google-maps'
 class Signup extends React.Component {
   constructor(props) {
     super(props);
     
     this.state = {  
+      maps : false,
       Terms :false,
       email_exist :false,
       valid_userEmail :true,
       valid_password :true,
       valid_location : true,
       valid_userName :true,
+      eye :false,
       password :  "",
     user_email :"",
     location : "",
     user_name : ""};
+  }
+
+  eye()
+  {
+    if(this.state.eye)
+    {
+      this.setState({eye:false})
+    }
+    else
+    {
+      this.setState({eye:true})
+    }
   }
 
   async onSubmit()
@@ -99,9 +114,10 @@ onChecked()
 }
 
   render () {
-    const {valid_userEmail ,valid_userName, valid_password,valid_location,email_exist} =this.state
+    const {valid_userEmail ,valid_userName, valid_password,valid_location,email_exist,eye} =this.state
    
-    return <div className ="pb_cover_v3 overflow-hidden cover-bg-indigo cover-bg-opacity text-left pb_gradient_v1 pb_slant-light">
+    return<> 
+    <div className ="pb_cover_v3 overflow-hidden cover-bg-indigo cover-bg-opacity text-left pb_gradient_v1 pb_slant-light">
    <div className="container m-auto ">
         <div className ="bg-white rounded pb_form_v1" >
           <h2>Sign Up  For Free</h2>
@@ -125,21 +141,28 @@ onChecked()
             }
             <br/>
           </div>
-          <div>
           
-            <input
-              type="password"
+          
+          <div className="input-group mb-3">
+  <input type= {eye ? "text": "password"}
               className="form-control pb_height-50 reverse"
               placeholder ="Password"
               id ="password"
               defaultValue =""
               onChange = {()=>{this.setState({password : document.getElementById("password").value})}}
-            onBlur ={()=>{this.ValidatePassword()}}
-            ></input>
-            {
+            onBlur ={()=>{this.ValidatePassword()}} aria-label="Recipient's username" aria-describedby="basic-addon2"/>
+  <div className="input-group-append">
+    {
+      eye ?  <i className="fa fa-eye"  style = {{ position : "absolute" , transform : '2' ,right : '2%' ,top : "20%"}} onClick = {()=>{this.eye()}} aria-hidden="true"></i> :
+      <i class="fa fa-eye-slash" style = {{ position : "absolute" , transform : '2' ,right : '2%' ,top : "20%"}} onClick = {()=>{this.eye()}} aria-hidden="true"></i>
+    }
+ 
+  </div>
+            
+          </div>
+          {
               valid_password ? true :<small className ="small-color">Incorrect Password</small>
             }
-          </div>
           <br/>
           <div >
            
@@ -165,6 +188,8 @@ onChecked()
               placeholder ="Location"
               id ="location"
               defaultValue =""
+              onClick = {()=>{this.setState({maps : true})}}
+              onBlur ={()=> {this.setState({maps:false})}}
               onChange = {()=>{this.setState({location : document.getElementById("location").value})}}
             />
            
@@ -190,7 +215,15 @@ onChecked()
           </div>
         </div>
       </div>
+      
     </div>
+    { this.state.maps ?
+    <div style ={{top :'25%' , left : '50%' , background : '#fff'}}>
+    <GoogleApiWrapper/>
+       </div> :false
+    
+  }
+  </>
   }
 }
 export default Signup
