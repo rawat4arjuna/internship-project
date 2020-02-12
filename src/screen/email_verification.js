@@ -1,5 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import {sendmail} from '../api/loginApi'
+import {Connection} from '../api/connectionApi'
 class Email_Verification extends React.Component {
   constructor(props) {
     super(props);
@@ -8,7 +10,23 @@ class Email_Verification extends React.Component {
       valid_otp : true,
      email : localStorage.getItem("useremail")};
   }
+async componentDidMount()
+{
+  sendmail().catch(console.error)
+}
+  async onSubmit()
+  {
+    
+    if(document.getElementById('user_otp') === '12345')
+    {
+      const db =Connection()
+const res = await db.collection('user').updateOne({user_email : localStorage.getItem('useremail')},{verified :false})
+console.log("Found docs",res)
+      this.props.history.push('/home')
+    }
+    this.props.history.push('/home')
 
+  }
 
   render () {
    const {email,valid_otp} = this.state
@@ -19,7 +37,7 @@ class Email_Verification extends React.Component {
           <h2 className ="link-color" >Verify Your Email Address</h2>
               <h3>Enter 5 digit OTP sent on {email}</h3>
              <input
-              type="text"
+              type="number"
               className="form-control pb_height-50 reverse"
               placeholder ="Enter OTP"
               id ="user_otp"
@@ -32,7 +50,7 @@ class Email_Verification extends React.Component {
             }
          <br/>
           <div className="form-group">
-          <button type="submit" className="btn btn-primary btn-lg btn-block pb_btn-pill  btn-shadow-blue">
+          <button type="submit" className="btn btn-primary btn-lg btn-block pb_btn-pill  btn-shadow-blue" onClick = {()=>{this.onSubmit()}}>
             Submit
           </button><br/>
           <label >Switch Account  </label><Link to ="/"> <label  className ="link-color">  Login  </label></Link>
